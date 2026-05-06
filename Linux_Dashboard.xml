@@ -1,0 +1,227 @@
+<dashboard version="1.1" theme="dark">
+  <label>SOC - Linux Overview</label>
+  <description>Baseline visibility for Linux hosts (syslog/auth/kern/cron/dpkg).</description>
+  <fieldset submitButton="false">
+    <input type="time" token="time">
+      <label>Time Range</label>
+      <default>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel>
+      <title>Event volume by host (24h)</title>
+      <table>
+        <search>
+          <query>index=linux | stats count by host | sort - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Events over time</title>
+      <chart>
+        <search>
+          <query>index=linux | timechart span=1h count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.seriesColors">["#00C2FF"]</option>
+      </chart>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Top sourcetypes</title>
+      <table>
+        <search>
+          <query>index=linux | stats count by sourcetype | sort - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Top processes (syslog)</title>
+      <table>
+        <search>
+          <query><![CDATA[index=linux sourcetype=syslog | rex "^(?:\w{3}\s+\d+\s[\d:]+)\s+(?<host>[^\s]+)\s+(?<process>[^\[:]+)" | stats count by process | sort - count | head 20]]></query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>SSH auth summary (success vs fail)</title>
+      <chart>
+        <search>
+          <query>index=linux sourcetype=linux_secure ("Failed password" OR "Accepted password") | eval outcome=if(match(_raw,"Failed password"),"failed","success") | stats count by outcome</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.seriesColors">["#22C55E","#EF4444"]</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Unique SSH users</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure "Accepted password" | rex "for (?&lt;user&gt;[^\\s]+) from" | stats dc(user) as unique_users values(user) as users</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Top failed SSH source IPs</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure "Failed password" | rex "from (?&lt;src&gt;\\d+\\.\\d+\\.\\d+\\.\\d+)" | stats count by src | sort - count | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Top successful SSH source IPs</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure "Accepted password" | rex "from (?&lt;src&gt;\\d+\\.\\d+\\.\\d+\\.\\d+)" | stats count by src | sort - count | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Sudo usage by user</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure "sudo:" | rex "sudo:\\s+(?&lt;user&gt;[^\\s]+)\\s*:" | stats count by user | sort - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Top sudo commands</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure "sudo:" "COMMAND=" | rex "COMMAND=(?&lt;command&gt;.+)$" | stats count by command | sort - count | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>New user creation events</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure ("useradd" OR "adduser") | table _time host _raw | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>User added to sudo/wheel</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure ("usermod" OR "gpasswd" OR "sudoers") (sudo OR wheel) | table _time host _raw | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Cron activity (jobs over time)</title>
+      <chart>
+        <search>
+          <query>index=linux sourcetype=linux_cron | timechart span=1h count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.seriesColors">["#A855F7"]</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top cron commands</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_cron "CMD" | rex "CMD \\((?&lt;command&gt;.+)\\)" | stats count by command | sort - count | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Kernel warnings/errors</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_kern (error OR warn OR fail) | table _time host _raw | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Package installs/updates (dpkg)</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_pkg (install OR upgrade) | table _time host _raw | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Rare messages (syslog)</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=syslog | rare limit=20 _raw</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Auth failures (non-SSH)</title>
+      <table>
+        <search>
+          <query>index=linux sourcetype=linux_secure ("authentication failure" OR "Failed password") NOT sshd | table _time host _raw | head 20</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</dashboard>
