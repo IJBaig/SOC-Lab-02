@@ -1,16 +1,20 @@
 # SOC Lab 02 (Splunk + Win10 Sysmon Enhancements + Linux Logs + Dashboards)
 
 **Date:** 2026-05-06  
-<p> This is the next step after SOC-Lab-01. We expand the lab with richer Sysmon telemetry, fix Sysmon permissions, add a second VM (Linux), collect rsyslog data, and build a Linux dashboard. We also simulate SSH attacks and validate logs. </p>
+<p> Previously We created a Splunk Dashboard with Windows 10 logs and optional Sysmon now we will take it to one step further. Adding another Machine and some other steps and at the end we also simulate an attack to check if our environment will show digested data. </p>
+
+**Note** <br>
+The was an error in previous Lab in Sysmon as it was optional for that lab so we skip it but now we will resolve that issue and also add an extension to it (SwiftOnSecurity). <br>
+We expand the lab with richer Sysmon telemetry, fix Sysmon permissions, add a second VM (Linux), collect rsyslog data, inhance the windows win10 dashboard and build a Linux dashboard. We also simulate SSH attacks and validate logs.
 
 ---
 
 ## Overview (What you built)
-The goal is to extend SOC-Lab-01 into a fuller SOC lab:
-- Enhanced Sysmon logging on Windows 10
+Continue from [SOC-Lab-01](https://github.com/IJBaig/SOC-Lab-01) We will:
+- Enhanced Sysmon logging on Windows 10 With SwiftOnSecurity.
 - Windows dashboard updated for PowerShell, Defender, DNS, and WMI
 - Added a second Linux VM
-- Ingest Linux logs via Splunk UF (or rsyslog to Splunk)
+- Ingest Linux logs via Splunk UF (using rsyslog)
 - Fix Sysmon permission error (Event Log Readers)
 - Build Linux dashboard
 - Validate SSH auth activity in logs
@@ -36,21 +40,24 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
 
 ## Prerequisites
 
-### 1: Host Machine
-- Minimum 8G RAM, 50G+ storage
-
-### 2: Virtualization Software
-- VirtualBox (or any, keep network config consistent)
+### 1: Previous Lab
+- [SOC-Lab-01](https://github.com/IJBaig/SOC-Lab-01)
 
 ### 3: Client Machines
-- **Windows 10**
-- **Linux VM (Ubuntu/Debian/Kali)**
+- **Linux VM (Ubuntu/Debian/any)**
+  - we will use Debian based Linux.
+  - Download The iso from Original webpage
 
 ---
 
 ## Installation & Configuration (Step-by-step)
 
-### 1: Update Windows Sysmon Configuration
+#### 1: Linux to Virtual Box
+-  Configuration are the same use the same 2 network adapter as of windows
+  - 1 NAT
+  - 2 Host-only Adapter
+
+#### 1: Update Windows Sysmon Configuration
 - Install Sysmon with **SwiftOnSecurity** or **Olaf Hartong** config
 - Verify Sysmon service is running:
 ```bash
