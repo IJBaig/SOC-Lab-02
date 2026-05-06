@@ -1,9 +1,9 @@
 import paramiko
 import time
 
-TARGET_IP = '127.0.0.6'
-USERNAME = 'ij_baig'
-PASSWORD = '00@123qwery'
+TARGET_IP = 'IPADDR'
+USERNAME = 'SSH_USerName'
+PASSWORD = 'SSH_PASSWORD'
 
 # Loop Configuration
 NUM_LOGINS = 25       # How many successful logins to generate
