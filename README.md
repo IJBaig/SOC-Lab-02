@@ -1,1 +1,211 @@
-# SOC-Lab-02
+# SOC Lab 02 (Splunk + Win10 Sysmon Enhancements + Linux Logs + Dashboards)
+
+**Date:** 2026-05-06  
+<p> This is the next step after SOC-Lab-01. We expand the lab with richer Sysmon telemetry, fix Sysmon permissions, add a second VM (Linux), collect rsyslog data, and build a Linux dashboard. We also simulate SSH attacks and validate logs. </p>
+
+---
+
+## Overview (What you built)
+The goal is to extend SOC-Lab-01 into a fuller SOC lab:
+- Enhanced Sysmon logging on Windows 10
+- Windows dashboard updated for PowerShell, Defender, DNS, and WMI
+- Added a second Linux VM
+- Ingest Linux logs via Splunk UF (or rsyslog to Splunk)
+- Fix Sysmon permission error (Event Log Readers)
+- Build Linux dashboard
+- Validate SSH auth activity in logs
+
+---
+
+## Architecture
+- **Windows 10**
+  - Splunk Universal Forwarder
+  - Sysmon (with SwiftOnSecurity or Olaf Hartong config)
+- **Linux VM #2**
+  - Splunk UF or rsyslog forwarder
+- **Kali Linux (Splunk Enterprise)**
+  - Receiver/indexer (TCP 9997)
+
+---
+
+## Data Flow
+Windows Event Logs / Sysmon → Splunk UF → TCP 9997 → Splunk Receiver → index (`win10`)  
+Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
+
+---
+
+## Prerequisites
+
+### 1: Host Machine
+- Minimum 8G RAM, 50G+ storage
+
+### 2: Virtualization Software
+- VirtualBox (or any, keep network config consistent)
+
+### 3: Client Machines
+- **Windows 10**
+- **Linux VM (Ubuntu/Debian/Kali)**
+
+---
+
+## Installation & Configuration (Step-by-step)
+
+### 1: Update Windows Sysmon Configuration
+- Install Sysmon with **SwiftOnSecurity** or **Olaf Hartong** config
+- Verify Sysmon service is running:
+```bash
+sc query Sysmon64
+```
+
+### 2: Enable extra Windows data sources
+Add to `inputs.conf` (Windows UF):
+```
+[WinEventLog://Microsoft-Windows-PowerShell/Operational]
+disabled = 0
+index = win10
+sourcetype = WinEventLog:PowerShell
+
+[WinEventLog://Microsoft-Windows-Windows Defender/Operational]
+disabled = 0
+index = win10
+sourcetype = WinEventLog:Defender
+
+[WinEventLog://Microsoft-Windows-Sysmon/Operational]
+disabled = 0
+index = win10
+sourcetype = WinEventLog:Microsoft-Windows-Sysmon/Operational
+```
+
+Restart:
+```bash
+Restart-Service SplunkForwarder
+```
+
+---
+
+### 3: Fix Sysmon Permission Error (errorCode=5)
+Sysmon channel requires **Event Log Readers** permission.
+
+1. Identify UF service account:
+```bash
+Get-WmiObject Win32_Service -Filter "Name='SplunkForwarder'" | Select Name, StartName
+```
+
+2. Add permission:
+```bash
+net localgroup "Event Log Readers" "NT SERVICE\SplunkForwarder" /add
+```
+
+3. Restart UF:
+```bash
+Restart-Service SplunkForwarder
+```
+
+---
+
+### 4: Add Linux VM + Splunk UF
+- Install Splunk Universal Forwarder on Linux VM
+- Configure output to Kali receiver (`9997`)
+- Create `inputs.conf` for key logs:
+
+```
+[monitor:///var/log/syslog]
+index = linux
+sourcetype = syslog
+disabled = false
+
+[monitor:///var/log/auth.log]
+index = linux
+sourcetype = linux_secure
+disabled = false
+
+[monitor:///var/log/kern.log]
+index = linux
+sourcetype = linux_kern
+disabled = false
+
+[monitor:///var/log/cron.log]
+index = linux
+sourcetype = linux_cron
+disabled = false
+
+[monitor:///var/log/dpkg.log]
+index = linux
+sourcetype = linux_pkg
+disabled = false
+```
+
+Restart UF:
+```bash
+sudo /opt/splunkforwarder/bin/splunk restart
+```
+
+---
+
+### 5: Validate Linux logs in Splunk
+```bash
+index=linux | stats count by sourcetype | sort -count
+```
+
+---
+
+### 6: Update Win10 Dashboard
+- Add panels for:
+  - PowerShell Operational
+  - Defender Detections
+  - Sysmon DNS (Event ID 22)
+  - WMI Activity (Event ID 19/20/21)
+
+---
+
+### 7: Create Linux Dashboard
+Create a full Linux baseline dashboard with panels:
+- Event volume by host
+- Events over time
+- Top sourcetypes
+- SSH success/fail summary
+- SSH src IPs (failed/success)
+- Unique SSH users
+- Sudo usage + commands
+- New user creation
+- User added to sudo/wheel
+- Cron activity and commands
+- Kernel warnings/errors
+- Package installs/updates
+- Rare messages
+- Auth failures (non-SSH)
+
+---
+
+## SSH Attack (Simulation)
+### SSH brute force / failed login test
+
+---
+
+## Validation Queries
+
+**Sysmon verification**
+```bash
+index=win10 sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational" | stats count by EventCode
+```
+
+**Linux SSH failures**
+```bash
+index=linux sourcetype=linux_secure "Failed password" | stats count by src
+```
+
+**Linux SSH success**
+```bash
+index=linux sourcetype=linux_secure "Accepted password" | stats count by user
+```
+
+---
+
+## Dashboards
+- **Windows SOC overview** (updated)
+- **Linux SOC overview** (new)
+
+---
+
+## Screenshots
+(Add your screenshots here)
