@@ -1,6 +1,6 @@
 # SOC Lab 02 (Splunk + Win10 Sysmon Enhancements + Linux Logs + Dashboards)
 
-**Date:** 2026-05-06  
+**Date:** 2026-06-06  
 <p> Previously We created a Splunk Dashboard with Windows 10 logs and optional Sysmon now we will take it to one step further. Adding another Machine and some other steps and at the end we also simulate an attack to check if our environment will show digested data. </p>
 
 **Note** <br>
@@ -25,7 +25,7 @@ Continue from [SOC-Lab-01](https://github.com/IJBaig/SOC-Lab-01) We will:
 - **Windows 10**
   - Splunk Universal Forwarder
   - Sysmon (with SwiftOnSecurity or Olaf Hartong config)
-- **Linux VM #2**
+- **Linux VM**
   - Splunk UF or rsyslog forwarder
 - **Kali Linux (Splunk Enterprise)**
   - Receiver/indexer (TCP 9997)
@@ -57,13 +57,28 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
   - 1 NAT
   - 2 Host-only Adapter
 
-#### 1: Update Windows Sysmon Configuration
-- Install Sysmon with **SwiftOnSecurity** or **Olaf Hartong** config
+
+
+
+
+
+
+
+
+
+
+
+#### 2: Update Windows Sysmon Configuration
 - Verify Sysmon service is running:
 ```bash
 sc query Sysmon64
 ```
-
+- Install Sysmon with **SwiftOnSecurity** config
+  - Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile C:\Temp\sysmonconfig.xml
+  
+```cmd
+C:\Temp\Sysmon\Sysmon64.exe -c C:\Temp\sysmonconfig.xml
+```
 ### 2: Enable extra Windows data sources
 Add to `inputs.conf` (Windows UF):
 ```
