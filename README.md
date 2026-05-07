@@ -5,7 +5,7 @@
 
 **Note** <br>
 The was an error in previous Lab in Sysmon as it was optional for that lab so we skip it but now we will resolve that issue and also add an extension to it (SwiftOnSecurity). <br>
-We expand the lab with richer Sysmon telemetry, fix Sysmon permissions, add a second VM (Linux), collect rsyslog data, inhance the windows win10 dashboard and build a Linux dashboard. We also simulate SSH attacks and validate logs.
+We expand the lab with richer Sysmon telemetry, fix Sysmon permissions, add a second VM (Linux), collect rsyslog data, Enhance the windows win10 dashboard and build a Linux dashboard. We also simulate SSH attacks and validate logs.
 
 ---
 
@@ -67,10 +67,10 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
         ```
   - Check Rule installation
     - ```cmd
-      C:\Temp\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c
+      C:\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c
       ```
     - you will see bunch of rules or with your turtles luck no rule installed
-    - just check what you did wrong or repeate the steps it will workout
+    - just check what you did wrong or repeat the steps it will work out
 
 #### 2: Enable extra Windows data sources
 we will add 2 more DataSources Powershell and Windows Defender and also the Sysmon.
@@ -114,7 +114,7 @@ index=win10 | stats count by sourcetype | sort -count
       cd /opt
       dpkg -i <install_package_name>
       ```
-- Start Splunk and set usename and password
+- Start Splunk and set username and password
   - ```bash
     sudo /opt/splunkforwarder/bin/splunk start --accept-license
     ```
@@ -143,7 +143,7 @@ index=win10 | stats count by sourcetype | sort -count
 
 ### 6: DashBoards
 #### Update Win10 Dashboard
-Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Dasboard.xml)
+Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Dashboard.xml)
 - Along with previous panels new were added:
   - PowerShell Operational
   - Defender Detections
@@ -159,7 +159,7 @@ Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Das
 <br>
 
 #### Create Linux Dashboard
-Complete Classic Dashboard xml code is at [Linux_Dashboard.xml](Linux_Dasboard.xml). <br>
+Complete Classic Dashboard xml code is at [Linux_Dashboard.xml](Linux_Dashboard.xml). <br>
 
 Linux baseline dashboard with panels:
 - Event volume by host
@@ -189,17 +189,17 @@ Linux baseline dashboard with panels:
 
 ## SSH Attack (Simulation)
 
-we add some panels for SSH its time to check them we will simulate SSH both Sucessful and Failed login attempt using `python` (success) and `hydra` (failed). <br>
+we add some panels for SSH its time to check them we will simulate SSH both Successful and Failed login attempt using `python` (success) and `hydra` (failed). <br>
 
 Start SSH service in Linux
 - Failed Attempts:
   - Hydra BruteForce
     - ```bash
-      hydra -l LINUX_USERNAME -P worldlist ssh@Linux_IP
+      hydra -l LINUX_USERNAME -P wordlist ssh://Linux_IP
       ```
-    - Try from same machine or form Your Host machine We just need the logs so you can add `localhost` in Place of ip and try from the same linux Virtual machine.
-- Sucess Attempts:
-  - Set the values in the script [brute_sucessFull_log_generation.py](brute_sucessFull_log_generation.py) at the start of code with real username and password or use wrong password for failed login logs.
+    - Try from same machine or from Your Host machine We just need the logs so you can add `localhost` in Place of ip and try from the same linux Virtual machine.
+- Success Attempts:
+  - Set the values in the script [brute_successful_log_generation.py](brute_successful_log_generation.py) at the start of code with real username and password or use wrong password for failed login logs.
 
 ### SSH brute force / failed login test
 <img src=images/SSH_Dashboard.png>
