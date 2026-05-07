@@ -143,7 +143,7 @@ index=win10 | stats count by sourcetype | sort -count
 
 ### 6: DashBoards
 #### Update Win10 Dashboard
-Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Dashboard.xml)
+Complete Updated Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Dashboard.xml)
 - Along with previous panels new were added:
   - PowerShell Operational
   - Defender Detections
