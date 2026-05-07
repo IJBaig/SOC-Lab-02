@@ -43,8 +43,7 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
 ### 1: Previous Lab
 - [SOC-Lab-01](https://github.com/IJBaig/SOC-Lab-01)
 
-### 3: Client Machines
-- **Linux VM (Ubuntu/Debian/any)**
+### 2: Linux VM (Ubuntu/Debian/any)
   - we will use Debian based Linux.
   - Download The iso from Original webpage
 
@@ -57,55 +56,34 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
   - 1 NAT
   - 2 Host-only Adapter
 
-
-
-
-
-
-
-
-
-
-
-
 #### 2: Update Windows Sysmon Configuration
 - Verify Sysmon service is running:
-```bash
-sc query Sysmon64
-```
+  - ```bash
+    sc query Sysmon64
+    ```
 - Install Sysmon with **SwiftOnSecurity** config
-  - Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile C:\Temp\sysmonconfig.xml
-  
-```cmd
-C:\Temp\Sysmon\Sysmon64.exe -c C:\Temp\sysmonconfig.xml
-```
-### 2: Enable extra Windows data sources
-Add to `inputs.conf` (Windows UF):
-```
-[WinEventLog://Microsoft-Windows-PowerShell/Operational]
-disabled = 0
-index = win10
-sourcetype = WinEventLog:PowerShell
+  - Run in Windows Powershell
+    - ```powershell
+      Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile C:\Temp\sysmonconfig.xml
+      ```
+  - Goto to Sysmon installed Directory (in our case Downloads)
+    -   ```PowerShell
+        C:\Temp\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c C:\Temp\sysmonconfig.xml
+        ```
+  - Check Rule installation
+    - ```cmd
+      C:\Temp\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c
+      ```
+    - you will see bunch of rules or with your turtles luck no rule installed
+    - just check what you did wrong or repeate the steps it will workout
 
-[WinEventLog://Microsoft-Windows-Windows Defender/Operational]
-disabled = 0
-index = win10
-sourcetype = WinEventLog:Defender
+#### 3: Enable extra Windows data sources
+we will add 2 more DataSources Powershell and Windows Defender and also the Sysmon.
+- Same as we implemented in previous Lab:
+- Directory `C:\Program Files\SplunkUniversalForwarder\etc\system\local`
+- Create or Replace the Content of `inputs.conf` with [win10_inputs.conf](win10_inputs.conf)
 
-[WinEventLog://Microsoft-Windows-Sysmon/Operational]
-disabled = 0
-index = win10
-sourcetype = WinEventLog:Microsoft-Windows-Sysmon/Operational
-```
-
-Restart:
-```bash
-Restart-Service SplunkForwarder
-```
-
----
-
-### 3: Fix Sysmon Permission Error (errorCode=5)
+#### 4: Fix Sysmon Permission Error (errorCode=5)
 Sysmon channel requires **Event Log Readers** permission.
 
 1. Identify UF service account:
@@ -119,13 +97,16 @@ net localgroup "Event Log Readers" "NT SERVICE\SplunkForwarder" /add
 ```
 
 3. Restart UF:
-```bash
-Restart-Service SplunkForwarder
+```PowerShell
+C:\Program Files\SplunkUniversalForwarder\bin\Splunk restart
+```
+4. Verify:
+Run the Command in Splunk web Search and Reporting app
+```SPL
+index=linux | stats count by sourcetype | sort -count
 ```
 
----
-
-### 4: Add Linux VM + Splunk UF
+#### 5: Add Linux VM + Splunk UF
 - Install Splunk Universal Forwarder on Linux VM
 - Configure output to Kali receiver (`9997`)
 - Create `inputs.conf` for key logs:
@@ -164,7 +145,7 @@ sudo /opt/splunkforwarder/bin/splunk restart
 
 ---
 
-### 5: Validate Linux logs in Splunk
+### 6: Validate Linux logs in Splunk
 ```bash
 index=linux | stats count by sourcetype | sort -count
 ```
