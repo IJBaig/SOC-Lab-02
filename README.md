@@ -186,7 +186,6 @@ Linux baseline dashboard with panels:
 <img src=images/linux_05.png>
 
 <br>
----
 
 ## SSH Attack (Simulation)
 
@@ -200,8 +199,9 @@ Start SSH service in Linux
       ```
     - Try from same machine or form Your Host machine We just need the logs so you can add `localhost` in Place of ip and try from the same linux Virtual machine.
 - Sucess Attempts:
-  - Set the values in the script [brute_sucessFull_log_generation.py](brute_sucessFull_log_generation.py) at the start of code with real username and password.
+  - Set the values in the script [brute_sucessFull_log_generation.py](brute_sucessFull_log_generation.py) at the start of code with real username and password or use wrong password for failed login logs.
 
 ### SSH brute force / failed login test
 <img src=images/SSH_Dashboard.png>
+
 ---
