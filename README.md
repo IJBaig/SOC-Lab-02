@@ -149,11 +149,19 @@ Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Das
   - Defender Detections
   - Sysmon DNS (Event ID 22)
   - WMI Activity (Event ID 19/20/21)
+<br>
 
+<img src=images/win10_01>
+<img src=images/win10_02>
+<img src=images/win10_03>
+<img src=images/win10_04>
 
-#### 7: Create Linux Dashboard
-Complete Classic Dashboard xml code is at [Linux_Dashboard.xml](Linux_Dasboard.xml)
-Create a full Linux baseline dashboard with panels:
+<br>
+
+#### Create Linux Dashboard
+Complete Classic Dashboard xml code is at [Linux_Dashboard.xml](Linux_Dasboard.xml). <br>
+
+Linux baseline dashboard with panels:
 - Event volume by host
 - Events over time
 - Top sourcetypes
@@ -169,9 +177,33 @@ Create a full Linux baseline dashboard with panels:
 - Rare messages
 - Auth failures (non-SSH)
 
+<br>
+
+<img src=images/linux_01>
+<img src=images/linux_02>
+<img src=images/linux_03>
+<img src=images/linux_04>
+<img src=images/linux_05>
+
+<br>
 ---
 
 ## SSH Attack (Simulation)
+
+we add some panels for SSH its time to check them we will simulate SSH both Sucessful and Failed login attempt using `python` (success) and `hydra` (failed). <br>
+
+Start SSH service in Linux
+- Failed Attempts:
+  - Hydra BruteForce
+    - ```bash
+      hydra -l LINUX_USERNAME -P worldlist ssh@Linux_IP
+      ```
+    - Try from same machine or form Your Host machine We just need the logs so you can add `localhost` in Place of ip and try from the same linux Virtual machine.
+- Sucess Attempts:
+  - Set the values in the script [brute_sucessFull_log_generation.py](brute_sucessFull_log_generation.py) at the start of code with real username and password.
+- Dashboard Logs View:
+<img src=images/SSH_Dashboard.png>
+
 ### SSH brute force / failed login test
 
 ---
