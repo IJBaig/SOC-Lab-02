@@ -151,10 +151,10 @@ Complete Upaded Classic Dashboard xml code is at [win10_Dashboard.xml](win10_Das
   - WMI Activity (Event ID 19/20/21)
 <br>
 
-<img src=images/win10_01>
-<img src=images/win10_02>
-<img src=images/win10_03>
-<img src=images/win10_04>
+<img src=images/win10_01.png>
+<img src=images/win10_02.png>
+<img src=images/win10_03.png>
+<img src=images/win10_04.png>
 
 <br>
 
@@ -179,11 +179,11 @@ Linux baseline dashboard with panels:
 
 <br>
 
-<img src=images/linux_01>
-<img src=images/linux_02>
-<img src=images/linux_03>
-<img src=images/linux_04>
-<img src=images/linux_05>
+<img src=images/linux_01.png>
+<img src=images/linux_02.png>
+<img src=images/linux_03.png>
+<img src=images/linux_04.png>
+<img src=images/linux_05.png>
 
 <br>
 ---
@@ -201,9 +201,7 @@ Start SSH service in Linux
     - Try from same machine or form Your Host machine We just need the logs so you can add `localhost` in Place of ip and try from the same linux Virtual machine.
 - Sucess Attempts:
   - Set the values in the script [brute_sucessFull_log_generation.py](brute_sucessFull_log_generation.py) at the start of code with real username and password.
-- Dashboard Logs View:
-<img src=images/SSH_Dashboard.png>
 
 ### SSH brute force / failed login test
-
+<img src=images/SSH_Dashboard.png>
 ---
