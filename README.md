@@ -63,7 +63,7 @@ Linux logs (/var/log/*) → UF / rsyslog → Splunk Receiver → index (`linux`)
       ```
   - Goto to Sysmon installed Directory (in our case Downloads)
     -   ```PowerShell
-        C:\Temp\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c C:\Temp\sysmonconfig.xml
+        C:\Users\<yourusername>\Downloads\Sysmon\Sysmon64.exe -c C:\Temp\sysmonconfig.xml
         ```
   - Check Rule installation
     - ```cmd
